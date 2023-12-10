@@ -1,0 +1,58 @@
+{% load param_change %}
+
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>簡易掲示板</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+</head>
+<body>
+
+    <main class="container">
+
+        {# 検索 #}
+        <form>
+            <input type="text" name="search" placeholder="ここにキーワード" value="{{ request.GET.search }}">
+            <input type="submit" value="検索"> 
+        </form>
+
+
+        {# ここが投稿用フォーム #}
+        <form method="POST">
+            {% csrf_token %}
+            <textarea class="form-control" name="comment"></textarea>
+            <input type="submit" value="送信">
+        </form>
+
+        {# ここが投稿されたデータの表示領域 #}
+        {% for topic in topics %}
+        <div class="border">
+            {{ topic.comment }}
+        </div>
+        {% endfor %}
+
+
+        <ul class="pagination justify-content-center">
+            {% if topics.has_previous %}
+            <li class="page-item"><a class="page-link" href="?{% url_replace request 'page' '1' %}">最初のページ</a></li>
+            <li class="page-item"><a class="page-link" href="?{% url_replace request 'page' topics.previous_page_number %}">前のページ</a></li>
+            {% else %}
+            <li class="page-item"><a class="page-link">最初のページ</a></li>
+            <li class="page-item"><a class="page-link">前のページ</a></li>
+            {% endif %}
+            <li class="page-item"><a class="page-link">{{ topics.number }}</a></li>
+            {% if topics.has_next %}
+            <li class="page-item"><a class="page-link" href="?{% url_replace request 'page' topics.next_page_number %}">次のページ</a></li>
+            <li class="page-item"><a class="page-link" href="?{% url_replace request 'page' topics.paginator.num_pages %}">最後のページ</a></li>
+            {% else %}
+            <li class="page-item"><a class="page-link">次のページ</a></li>
+            <li class="page-item"><a class="page-link">最後のページ</a></li>
+            {% endif %}
+        </ul>
+
+    </main>
+</body>
+</html>
